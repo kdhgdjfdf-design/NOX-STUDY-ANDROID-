@@ -1,0 +1,174 @@
+<resources>
+    <string name="app_name">NOX STUDY 📚</string>
+    <string name="accessibility_service_label">Bloqueur d\'applications NOX STUDY</string>
+    <string name="accessibility_service_description">Vous aide à vous concentrer en bloquant temporairement les applications sélectionnées pendant vos sessions d\'étude.</string>
+
+    <!-- General -->
+    <string name="cancel">Annuler</string>
+    <string name="save">Enregistrer</string>
+    <string name="delete">Supprimer</string>
+    <string name="edit">Modifier</string>
+    <string name="close">Fermer</string>
+    <string name="back">Retour</string>
+    <string name="done">Terminé</string>
+    <string name="confirm">Confirmer</string>
+    <string name="start">Démarrer</string>
+    <string name="pause">Pause</string>
+    <string name="resume">Reprendre</string>
+    <string name="stop">Arrêter</string>
+    <string name="skip">Passer</string>
+    <string name="add">Ajouter</string>
+    <string name="search">Rechercher</string>
+
+    <!-- Home -->
+    <string name="greeting_morning">Bonjour et bonnes études ☀️</string>
+    <string name="greeting_afternoon">Bon après-midi, place au focus 📖</string>
+    <string name="greeting_evening">Soirée d\'étude calme et chaleureuse ☕</string>
+    <string name="greeting_night">Séance d\'étude nocturne douillette 🌙</string>
+    <string name="daily_quote_title">Inspiration du jour</string>
+    <string name="stats_button">Statistiques</string>
+    <string name="settings_button">Paramètres</string>
+    <string name="today_summary_title">Faits saillants du jour</string>
+    <string name="today_focus_time">Temps de concentration</string>
+    <string name="today_sessions">Sessions terminées</string>
+    <string name="today_tasks_done">Tâches accomplies</string>
+
+    <!-- Sections -->
+    <string name="section_study_org">Organisation des études</string>
+    <string name="section_study_org_desc">Leçons, devoirs et examens à venir</string>
+    <string name="section_focus">Espace Concentration</string>
+    <string name="section_focus_desc">Pomodoro, minuteur personnalisé &amp; bloqueur</string>
+    <string name="section_flashcards">Cartes Mémoire</string>
+    <string name="section_flashcards_desc">Cartes 3D interactives avec niveau de rappel</string>
+    <string name="section_challenges">Défis Individuels</string>
+    <string name="section_challenges_desc">Objectifs quotidiens avec badges de réussite</string>
+
+    <!-- Study Org -->
+    <string name="tab_lessons">Leçons &amp; Révisions</string>
+    <string name="tab_tasks">Devoirs &amp; Tâches</string>
+    <string name="tab_exams">Examens</string>
+
+    <string name="add_subject">Ajouter une matière</string>
+    <string name="subject_name">Nom de la matière</string>
+    <string name="lessons_count">%d leçons</string>
+    <string name="revisions_due">%d révisions dues</string>
+    <string name="add_lesson">Ajouter une leçon</string>
+    <string name="lesson_title">Titre de la leçon</string>
+    <string name="lesson_status">Statut</string>
+    <string name="status_not_started">Non commencé</string>
+    <string name="status_in_progress">En cours d\'apprentissage</string>
+    <string name="status_needs_revision">Nécessite révision</string>
+    <string name="status_reviewed">Révisé</string>
+    <string name="next_revision">Prochaine révision</string>
+    <string name="personal_notes">Notes personnelles</string>
+    <string name="attach_file">Joindre PDF ou Image</string>
+    <string name="attachments">Pièces jointes</string>
+    <string name="suggest_revision">Suggérer date de révision</string>
+
+    <!-- Tasks -->
+    <string name="add_task">Ajouter une tâche</string>
+    <string name="task_title">Titre de la tâche</string>
+    <string name="due_date">Date d\'échéance</string>
+    <string name="priority">Priorité</string>
+    <string name="priority_high">Haute</string>
+    <string name="priority_medium">Moyenne</string>
+    <string name="priority_low">Basse</string>
+    <string name="task_pending">En attente</string>
+    <string name="task_in_progress">En cours</string>
+    <string name="task_completed">Terminée</string>
+    <string name="reminder_before">Rappel avant échéance</string>
+
+    <!-- Exams -->
+    <string name="add_exam">Ajouter un examen</string>
+    <string name="exam_title">Titre de l\'examen</string>
+    <string name="exam_date">Date de l\'examen</string>
+    <string name="readiness_level">Niveau de préparation</string>
+    <string name="readiness_low">Faible</string>
+    <string name="readiness_medium">Moyen</string>
+    <string name="readiness_high">Entièrement prêt</string>
+    <string name="linked_lessons">Leçons associées</string>
+    <string name="suggest_linked_lessons">Suggérer leçons de la matière</string>
+
+    <!-- Focus & Pomodoro -->
+    <string name="focus_title">Mode Concentration</string>
+    <string name="mode_pomodoro">Pomodoro (25/5)</string>
+    <string name="mode_custom">Minuteur personnalisé</string>
+    <string name="mode_free">Focus Libre</string>
+    <string name="duration_minutes">Durée (minutes)</string>
+    <string name="app_blocker_active">Blocage actif</string>
+    <string name="app_blocker_manage">Gérer applications bloquées</string>
+    <string name="break_title">Temps de pause ☕</string>
+    <string name="break_time_left">Temps restant pour la pause</string>
+    <string name="session_summary_title">Résumé de session 🌟</string>
+    <string name="actual_focus_time">Temps réel de concentration</string>
+    <string name="goal_achieved">Objectif atteint ?</string>
+    <string name="completed_sessions_today">Sessions du jour terminées</string>
+    <string name="daily_goal_progress">Objectif quotidien</string>
+    <string name="weekly_goal_progress">Objectif hebdomadaire</string>
+    <string name="btn_take_break">Prendre une pause</string>
+    <string name="btn_new_session">Nouvelle session</string>
+
+    <!-- Blocked Screen -->
+    <string name="blocked_quote_1">« Le succès n\'est pas un hasard, il se forge par la concentration maintenant. »\nRetournez à vos études, votre avenir vous attend.</string>
+    <string name="blocked_quote_2">« Chaque minute loin des distractions vous rapproche de votre but. »\nVous êtes plus fort que cette notification.</string>
+    <string name="blocked_quote_3">« La patience est la moitié du savoir, la concentration est l\'autre. »\nReprenez votre séance d\'étude avec fierté.</string>
+    <string name="blocked_quote_4">« Ces moments calmes et disciplinés créent de grandes choses. »\nFermez cette application et continuez.</string>
+    <string name="btn_exit_to_study">Retour à l\'étude 📚</string>
+
+    <!-- Flashcards -->
+    <string name="flashcards_title">Cartes Mémoire</string>
+    <string name="add_flashcard">Nouvelle carte</string>
+    <string name="question">Question</string>
+    <string name="answer">Réponse</string>
+    <string name="tap_to_flip">Appuyer pour retourner la carte</string>
+    <string name="memory_level_title">Rappel</string>
+    <string name="memory_easy">Facile</string>
+    <string name="memory_medium">Moyen</string>
+    <string name="memory_hard">Difficile</string>
+
+    <!-- Challenges -->
+    <string name="challenges_title">Défis Individuels</string>
+    <string name="predefined_challenges">Défis prédéfinis NOX</string>
+    <string name="custom_challenges">Mes défis personnalisés</string>
+    <string name="add_challenge">Nouveau défi</string>
+    <string name="challenge_goal">Objectif cible</string>
+    <string name="challenge_deadline">Délai</string>
+    <string name="challenge_completed">Félicitations ! Défi accompli 🏆</string>
+    <string name="badge_unlocked">Nouveau badge débloqué !</string>
+
+    <!-- Statistics -->
+    <string name="stats_screen_title">Statistiques d\'étude</string>
+    <string name="completed_sessions_stat">Sessions terminées</string>
+    <string name="total_focus_time_stat">Temps total de concentration</string>
+    <string name="incomplete_sessions_stat">Sessions inachevées</string>
+    <string name="best_study_day">Meilleur jour d\'étude</string>
+    <string name="avg_session_duration">Durée moyenne</string>
+    <string name="monthly_overview">Vue mensuelle</string>
+
+    <!-- Music Player -->
+    <string name="music_library">Musique d\'étude relaxante</string>
+    <string name="track_rain_cozy">Pluie douce et feu de cheminée</string>
+    <string name="track_lofi_vibes">Beats Lo-Fi pour étudier</string>
+    <string name="track_cafe_ambience">Ambiance café littéraire</string>
+    <string name="track_deep_focus">Ondes Alpha Focus Profond</string>
+    <string name="add_device_music">Plus : Choisir des fichiers audio locaux</string>
+
+    <!-- Profile & Settings -->
+    <string name="profile_title">Profil</string>
+    <string name="user_name">Nom de l\'étudiant</string>
+    <string name="achievements_summary">Résumé des accomplissements</string>
+    <string name="settings_title">Paramètres</string>
+    <string name="language_setting">Langue</string>
+    <string name="theme_setting">Thème</string>
+    <string name="theme_light">Clair Cozy &amp; Chaleureux</string>
+    <string name="theme_dark">Nuit d\'étude Sombre</string>
+    <string name="theme_system">Par défaut du système</string>
+    <string name="notification_settings">Paramètres des notifications</string>
+    <string name="app_blocker_settings">Autorisation du bloqueur d\'applications</string>
+    <string name="wallpaper_settings">Personnaliser les fonds des sections</string>
+    <string name="restore_default_wallpapers">Restaurer les fonds par défaut</string>
+    <string name="backup_restore">Sauvegarde &amp; Restauration</string>
+    <string name="create_backup">Exporter sauvegarde (JSON)</string>
+    <string name="restore_backup">Importer sauvegarde (JSON)</string>
+    <string name="confirm_restore">Êtes-vous sûr de vouloir restaurer ? Les données actuelles seront remplacées.</string>
+</resources>

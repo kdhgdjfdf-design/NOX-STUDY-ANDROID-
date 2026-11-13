@@ -1,0 +1,174 @@
+<resources>
+    <string name="app_name">NOX STUDY 📚</string>
+    <string name="accessibility_service_label">حاجب تطبيقات NOX STUDY</string>
+    <string name="accessibility_service_description">يساعدك على التركيز بحجب التطبيقات المحددة مؤقتاً أثناء جلسات الدراسة النشطة.</string>
+
+    <!-- General -->
+    <string name="cancel">إلغاء</string>
+    <string name="save">حفظ</string>
+    <string name="delete">حذف</string>
+    <string name="edit">تعديل</string>
+    <string name="close">إغلاق</string>
+    <string name="back">رجوع</string>
+    <string name="done">تم</string>
+    <string name="confirm">تأكيد</string>
+    <string name="start">بدء</string>
+    <string name="pause">إيقاف مؤقت</string>
+    <string name="resume">استئناف</string>
+    <string name="stop">إنهاء</string>
+    <string name="skip">تخطي</string>
+    <string name="add">إضافة</string>
+    <string name="search">بحث</string>
+
+    <!-- Home -->
+    <string name="greeting_morning">صباح النور والدراسة ☀️</string>
+    <string name="greeting_afternoon">مساء التركيز والإنجاز 📖</string>
+    <string name="greeting_evening">أمسية هادئة ومثمرة ☕</string>
+    <string name="greeting_night">ليلة دراسية دافئة 🌙</string>
+    <string name="daily_quote_title">إلهام اليوم</string>
+    <string name="stats_button">الإحصائيات</string>
+    <string name="settings_button">الإعدادات</string>
+    <string name="today_summary_title">إنجازات اليوم</string>
+    <string name="today_focus_time">وقت التركيز</string>
+    <string name="today_sessions">الجلسات المكتملة</string>
+    <string name="today_tasks_done">المهام المنجزة</string>
+
+    <!-- Sections -->
+    <string name="section_study_org">تنظيم الدراسة</string>
+    <string name="section_study_org_desc">الدروس، الواجبات، ومواعيد الاختبارات</string>
+    <string name="section_focus">جلسات التركيز</string>
+    <string name="section_focus_desc">بومودورو، مؤقت مخصص، وحجب التطبيقات</string>
+    <string name="section_flashcards">بطاقات المراجعة</string>
+    <string name="section_flashcards_desc">بطاقات تفاعلية بتقييم ذكي للتذكر</string>
+    <string name="section_challenges">التحديات الفردية</string>
+    <string name="section_challenges_desc">تحديات يومية وشخصية مع شارات إنجاز</string>
+
+    <!-- Study Org -->
+    <string name="tab_lessons">الدروس والمراجعة</string>
+    <string name="tab_tasks">الواجبات والمهام</string>
+    <string name="tab_exams">الاختبارات</string>
+
+    <string name="add_subject">إضافة مادة</string>
+    <string name="subject_name">اسم المادة</string>
+    <string name="lessons_count">%d دروس</string>
+    <string name="revisions_due">%d مراجعات مستحقة</string>
+    <string name="add_lesson">إضافة درس</string>
+    <string name="lesson_title">عنوان الدرس</string>
+    <string name="lesson_status">الحالة</string>
+    <string name="status_not_started">لم أبدأ</string>
+    <string name="status_in_progress">قيد الدراسة</string>
+    <string name="status_needs_revision">يحتاج إلى مراجعة</string>
+    <string name="status_reviewed">تمت مراجعته</string>
+    <string name="next_revision">موعد المراجعة القادمة</string>
+    <string name="personal_notes">ملاحظات شخصية</string>
+    <string name="attach_file">إرفاق ملف أو صورة</string>
+    <string name="attachments">المرفقات</string>
+    <string name="suggest_revision">اقتراح موعد مراجعة</string>
+
+    <!-- Tasks -->
+    <string name="add_task">إضافة مهمة</string>
+    <string name="task_title">عنوان المهمة</string>
+    <string name="due_date">تاريخ التسليم</string>
+    <string name="priority">الأولوية</string>
+    <string name="priority_high">عالية</string>
+    <string name="priority_medium">متوسطة</string>
+    <string name="priority_low">منخفضة</string>
+    <string name="task_pending">قيد الانتظار</string>
+    <string name="task_in_progress">جاري العمل</string>
+    <string name="task_completed">مكتملة</string>
+    <string name="reminder_before">تنبيه قبل التسليم</string>
+
+    <!-- Exams -->
+    <string name="add_exam">إضافة اختبار</string>
+    <string name="exam_title">اسم الاختبار</string>
+    <string name="exam_date">تاريخ الاختبار</string>
+    <string name="readiness_level">مستوى الاستعداد</string>
+    <string name="readiness_low">منخفض</string>
+    <string name="readiness_medium">متوسط</string>
+    <string name="readiness_high">مستعد تماماً</string>
+    <string name="linked_lessons">الدروس المرتبطة</string>
+    <string name="suggest_linked_lessons">اقتراح دروس المادة</string>
+
+    <!-- Focus & Pomodoro -->
+    <string name="focus_title">مساحة التركيز</string>
+    <string name="mode_pomodoro">بومودورو (25/5)</string>
+    <string name="mode_custom">مؤقت مخصص</string>
+    <string name="mode_free">تركيز حر</string>
+    <string name="duration_minutes">المدة (بالدقائق)</string>
+    <string name="app_blocker_active">حجب التطبيقات مفعل</string>
+    <string name="app_blocker_manage">إدارة حجب التطبيقات</string>
+    <string name="break_title">وقت الاستراحة ☕</string>
+    <string name="break_time_left">الوقت المتبقي للاستراحة</string>
+    <string name="session_summary_title">ملخص الجلسة 🌟</string>
+    <string name="actual_focus_time">مدة التركيز الفعلية</string>
+    <string name="goal_achieved">هل تحقق الهدف؟</string>
+    <string name="completed_sessions_today">الجلسات المكتملة اليوم</string>
+    <string name="daily_goal_progress">الهدف اليومي</string>
+    <string name="weekly_goal_progress">الهدف الأسبوعي</string>
+    <string name="btn_take_break">أخذ استراحة</string>
+    <string name="btn_new_session">جلسة جديدة</string>
+
+    <!-- Blocked Screen -->
+    <string name="blocked_quote_1">«النجاح لا يأتي بالصدفة، بل بالالتزام والتركيز الآن.»\nعد إلى دراستك، مستقبلك ينتظرك.</string>
+    <string name="blocked_quote_2">«كل دقيقة تبتعد فيها عن المشتتات، تقربك خطوة من حلمك.»\nأنت أقوى من هذا الإشعار.</string>
+    <string name="blocked_quote_3">«الصبر نصف العلم، والتركيز نصفه الآخر.»\nأكمل جلستك بكل هدوء وفخر.</string>
+    <string name="blocked_quote_4">«لحظات الانضباط هذه ستصنع فارقاً ستفتخر به غداً.»\nأغلق هذا التطبيق واستمر.</string>
+    <string name="btn_exit_to_study">العودة إلى الدراسة 📚</string>
+
+    <!-- Flashcards -->
+    <string name="flashcards_title">بطاقات المراجعة</string>
+    <string name="add_flashcard">إنشاء بطاقة</string>
+    <string name="question">السؤال</string>
+    <string name="answer">الإجابة</string>
+    <string name="tap_to_flip">انقر لقلب البطاقة</string>
+    <string name="memory_level_title">التذكّر</string>
+    <string name="memory_easy">سهل</string>
+    <string name="memory_medium">متوسط</string>
+    <string name="memory_hard">صعب</string>
+
+    <!-- Challenges -->
+    <string name="challenges_title">التحديات الفردية</string>
+    <string name="predefined_challenges">تحديات NOX الجاهزة</string>
+    <string name="custom_challenges">تحدياتي الخاصة</string>
+    <string name="add_challenge">تحدٍ جديد</string>
+    <string name="challenge_goal">الهدف المطلوب</string>
+    <string name="challenge_deadline">المدة الزمنية</string>
+    <string name="challenge_completed">أحسنت! أكملت التحدي بنجاح 🏆</string>
+    <string name="badge_unlocked">تم فتح شارة إنجاز جديدة!</string>
+
+    <!-- Statistics -->
+    <string name="stats_screen_title">إحصائيات الدراسة</string>
+    <string name="completed_sessions_stat">جلسات مكتملة</string>
+    <string name="total_focus_time_stat">مجموع وقت التركيز</string>
+    <string name="incomplete_sessions_stat">جلسات غير مكتملة</string>
+    <string name="best_study_day">أفضل يوم دراسي</string>
+    <string name="avg_session_duration">متوسط مدة الجلسة</string>
+    <string name="monthly_overview">نظرة شهرية</string>
+
+    <!-- Music Player -->
+    <string name="music_library">مكتبة الموسيقى الهادئة</string>
+    <string name="track_rain_cozy">مطر هادئ وموقد دافئ</string>
+    <string name="track_lofi_vibes">نغمات لوفاي للدراسة والتركيز</string>
+    <string name="track_cafe_ambience">أجواء مقهى الكتب الهادئ</string>
+    <string name="track_deep_focus">موجات ألفا للتركيز العميق</string>
+    <string name="add_device_music">المزيد: اختيار من ملفات الهاتف</string>
+
+    <!-- Profile & Settings -->
+    <string name="profile_title">الملف الشخصي</string>
+    <string name="user_name">اسم الطالب</string>
+    <string name="achievements_summary">ملخص الإنجازات</string>
+    <string name="settings_title">الإعدادات</string>
+    <string name="language_setting">لغة التطبيق</string>
+    <string name="theme_setting">المظهر</string>
+    <string name="theme_light">الوضع الفاتح (Cozy Warm)</string>
+    <string name="theme_dark">الوضع الداكن (Night Study)</string>
+    <string name="theme_system">تلقائي حسب النظام</string>
+    <string name="notification_settings">إعدادات الإشعارات</string>
+    <string name="app_blocker_settings">إدارة صلاحية حجب التطبيقات</string>
+    <string name="wallpaper_settings">تخصيص خلفيات الأقسام</string>
+    <string name="restore_default_wallpapers">استعادة الخلفيات الافتراضية</string>
+    <string name="backup_restore">النسخ الاحتياطي والاستعادة</string>
+    <string name="create_backup">إنشاء نسخة احتياطية</string>
+    <string name="restore_backup">استعادة نسخة احتياطية</string>
+    <string name="confirm_restore">هل أنت متأكد من استعادة النسخة الاحتياطية؟ سيتم تحديث البيانات الحالية.</string>
+</resources>

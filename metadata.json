@@ -1,0 +1,6 @@
+{
+  "name": "NOX STUDY 📚",
+  "description": "تطبيق دراسي متكامل ودافئ بأسلوب Cozy Study لتنظيم الدروس، المهام، الاختبارات، جلسات التركيز وحجب التطبيقات، بطاقات المراجعة، ومشغل الموسيقى.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
