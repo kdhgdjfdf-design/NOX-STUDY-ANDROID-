@@ -70,3 +70,5 @@ jobs:
           name: nox-study-debug-apk
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
+
+# Re-run the Android build whenever this workflow is updated.
