@@ -40,13 +40,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.activity.OnBackPressedCallback
 import com.example.MainActivity
 import com.example.R
+import com.example.service.NotificationHelper
 import com.example.ui.theme.NoxStudyTheme
 import com.example.ui.theme.RedExit
 import kotlin.random.Random
 
 class BlockedAppActivity : ComponentActivity() {
+
+    companion object {
+        const val EXTRA_BLOCKED_PKG = "BLOCKED_PKG"
+
+        @Volatile
+        var isCurrentlyVisible: Boolean = false
+            private set
+    }
 
     private val motivationalQuotes = listOf(
         "«النجاح لا يأتي بالصدفة، بل بالالتزام والتركيز الآن.»\nعد إلى دراستك، مستقبلك ينتظرك.",
@@ -60,29 +70,48 @@ class BlockedAppActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                returnToStudyScreen()
+            }
+        })
+
         val randomQuote = motivationalQuotes[Random.nextInt(motivationalQuotes.size)]
 
         setContent {
             NoxStudyTheme(darkTheme = true) {
                 BlockedScreenContent(
                     quote = randomQuote,
-                    onExitToStudy = {
-                        val intent = Intent(this@BlockedAppActivity, MainActivity::class.java).apply {
-                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                        }
-                        startActivity(intent)
-                        finish()
-                    }
+                    onExitToStudy = { returnToStudyScreen() }
                 )
             }
         }
     }
 
-    @Deprecated("Deprecated in Java")
-    override fun onBackPressed() {
-        // Prevent bypassing blocked screen easily, return to study
-        val intent = Intent(this, MainActivity::class.java).apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+    override fun onResume() {
+        super.onResume()
+        isCurrentlyVisible = true
+    }
+
+    override fun onPause() {
+        super.onPause()
+        isCurrentlyVisible = false
+    }
+
+    override fun onDestroy() {
+        isCurrentlyVisible = false
+        super.onDestroy()
+    }
+
+    private fun returnToStudyScreen() {
+        isCurrentlyVisible = false
+        val intent = Intent(this@BlockedAppActivity, MainActivity::class.java).apply {
+            addFlags(
+                Intent.FLAG_ACTIVITY_NEW_TASK or
+                    Intent.FLAG_ACTIVITY_SINGLE_TOP or
+                    Intent.FLAG_ACTIVITY_CLEAR_TOP
+            )
+            putExtra(NotificationHelper.EXTRA_NAVIGATE_TO_FOCUS, true)
         }
         startActivity(intent)
         finish()

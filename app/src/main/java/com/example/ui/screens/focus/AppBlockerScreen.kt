@@ -65,6 +65,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.DisposableEffect
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.service.AppBlockerAccessibilityService
 import com.example.ui.viewmodel.MainViewModel
 import kotlinx.coroutines.Dispatchers
@@ -102,13 +106,22 @@ fun AppBlockerScreen(
     val scope = rememberCoroutineScope()
     val prefs by mainViewModel.preferences.collectAsState()
 
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val serviceConnected by AppBlockerAccessibilityService.isServiceConnected.collectAsState()
     var isAccessibilityEnabled by remember {
-        mutableStateOf(AppBlockerAccessibilityService.isAccessibilitySettingsEnabled(context))
+        mutableStateOf(AppBlockerAccessibilityService.isPermissionEffectivelyGranted(context))
     }
 
-    // Refresh permission status when screen appears
-    LaunchedEffect(Unit) {
-        isAccessibilityEnabled = AppBlockerAccessibilityService.isAccessibilitySettingsEnabled(context)
+    // Refresh permission status immediately whenever screen resumes or service binds
+    DisposableEffect(lifecycleOwner, serviceConnected) {
+        isAccessibilityEnabled = AppBlockerAccessibilityService.isPermissionEffectivelyGranted(context)
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                isAccessibilityEnabled = AppBlockerAccessibilityService.isPermissionEffectivelyGranted(context)
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
     var appList by remember { mutableStateOf<List<InstalledAppItem>>(emptyList()) }

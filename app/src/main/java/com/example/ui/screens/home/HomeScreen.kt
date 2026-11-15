@@ -60,6 +60,12 @@ import com.example.ui.components.MiniMusicPlayerDisk
 import com.example.ui.components.SectionCard
 import com.example.ui.music.MusicLibrarySheet
 import com.example.ui.profile.ProfileDialog
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Timer
+import androidx.compose.ui.text.style.TextOverflow
+import com.example.ui.viewmodel.BadgesViewModel
 import com.example.ui.viewmodel.MainViewModel
 import com.example.ui.viewmodel.Screen
 import java.util.Calendar
@@ -67,10 +73,13 @@ import java.util.Calendar
 @Composable
 fun HomeScreen(
     mainViewModel: MainViewModel,
+    badgesViewModel: BadgesViewModel,
     modifier: Modifier = Modifier
 ) {
     val prefs by mainViewModel.preferences.collectAsState()
     val todaySummary by mainViewModel.todaySummary.collectAsState()
+    val badges by badgesViewModel.badges.collectAsState()
+    val unlockedBadgeCount = badges.count { it.isUnlocked }
 
     var showMusicSheet by remember { mutableStateOf(false) }
     var showProfileDialog by remember { mutableStateOf(false) }
@@ -227,36 +236,58 @@ fun HomeScreen(
                 }
             }
 
-            // Quick Stats & Settings Row
+            // Quick Stats, Badges & Settings Row
             item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     // Statistics Button
                     ElevatedButton(
                         onClick = { mainViewModel.navigateTo(Screen.Stats) },
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 10.dp),
                         modifier = Modifier
                             .weight(1f)
                             .testTag("home_stats_button"),
                         shape = RoundedCornerShape(14.dp)
                     ) {
-                        Icon(Icons.Default.BarChart, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text("الإحصائيات", fontWeight = FontWeight.Bold)
+                        Icon(Icons.Default.BarChart, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("الإحصائيات", fontWeight = FontWeight.Bold, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    }
+
+                    // Badges Button
+                    ElevatedButton(
+                        onClick = { mainViewModel.navigateTo(Screen.Badges) },
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 10.dp),
+                        modifier = Modifier
+                            .weight(1f)
+                            .testTag("home_badges_button"),
+                        shape = RoundedCornerShape(14.dp)
+                    ) {
+                        Icon(Icons.Default.EmojiEvents, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color(0xFFD99B26))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = if (unlockedBadgeCount > 0) "الأوسمة ($unlockedBadgeCount)" else "الأوسمة",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 12.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                     }
 
                     // Settings Button
                     OutlinedButton(
                         onClick = { mainViewModel.navigateTo(Screen.Settings) },
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 10.dp),
                         modifier = Modifier
                             .weight(1f)
                             .testTag("home_settings_button"),
                         shape = RoundedCornerShape(14.dp)
                     ) {
-                        Icon(Icons.Default.Settings, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text("الإعدادات", fontWeight = FontWeight.Bold)
+                        Icon(Icons.Default.Settings, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("الإعدادات", fontWeight = FontWeight.Bold, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
                 }
             }
@@ -374,6 +405,11 @@ fun HomeScreen(
     if (showProfileDialog) {
         ProfileDialog(
             mainViewModel = mainViewModel,
+            badges = badges,
+            onOpenBadges = {
+                showProfileDialog = false
+                mainViewModel.navigateTo(Screen.Badges)
+            },
             onDismiss = { showProfileDialog = false }
         )
     }

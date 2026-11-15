@@ -10,7 +10,9 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.example.service.BlockerStateStore
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "nox_study_preferences")
@@ -32,7 +34,9 @@ data class UserPreferences(
     val notificationsEnabled: Boolean,
     val timerSoundEnabled: Boolean,
     val lastTrackIndex: Int,
-    val lastTrackPositionMs: Long
+    val lastTrackPositionMs: Long,
+    val completedFocusBreakCycles: Int = 0,
+    val flashcardsReviewedCount: Int = 0
 )
 
 class UserPreferencesRepository(private val context: Context) {
@@ -55,6 +59,8 @@ class UserPreferencesRepository(private val context: Context) {
         val TIMER_SOUND_ENABLED = booleanPreferencesKey("timer_sound_enabled")
         val LAST_TRACK_INDEX = intPreferencesKey("last_track_index")
         val LAST_TRACK_POSITION = longPreferencesKey("last_track_position")
+        val COMPLETED_FOCUS_BREAK_CYCLES = intPreferencesKey("completed_focus_break_cycles")
+        val FLASHCARDS_REVIEWED_COUNT = intPreferencesKey("flashcards_reviewed_count")
     }
 
     val userPreferencesFlow: Flow<UserPreferences> = context.dataStore.data.map { prefs ->
@@ -75,7 +81,9 @@ class UserPreferencesRepository(private val context: Context) {
             notificationsEnabled = prefs[Keys.NOTIFICATIONS_ENABLED] ?: true,
             timerSoundEnabled = prefs[Keys.TIMER_SOUND_ENABLED] ?: true,
             lastTrackIndex = prefs[Keys.LAST_TRACK_INDEX] ?: 0,
-            lastTrackPositionMs = prefs[Keys.LAST_TRACK_POSITION] ?: 0L
+            lastTrackPositionMs = prefs[Keys.LAST_TRACK_POSITION] ?: 0L,
+            completedFocusBreakCycles = prefs[Keys.COMPLETED_FOCUS_BREAK_CYCLES] ?: 0,
+            flashcardsReviewedCount = prefs[Keys.FLASHCARDS_REVIEWED_COUNT] ?: 0
         )
     }
 
@@ -111,15 +119,42 @@ class UserPreferencesRepository(private val context: Context) {
     }
 
     suspend fun setAppBlockerEnabled(enabled: Boolean) {
-        context.dataStore.edit { prefs ->
+        val updatedPrefs = context.dataStore.edit { prefs ->
             prefs[Keys.APP_BLOCKER_ENABLED] = enabled
         }
+        val pkgs = updatedPrefs[Keys.BLOCKED_PACKAGES] ?: emptySet()
+        BlockerStateStore.syncBlockerConfig(context, enabled, pkgs)
     }
 
     suspend fun updateBlockedPackages(packages: Set<String>) {
-        context.dataStore.edit { prefs ->
+        val updatedPrefs = context.dataStore.edit { prefs ->
             prefs[Keys.BLOCKED_PACKAGES] = packages
         }
+        val enabled = updatedPrefs[Keys.APP_BLOCKER_ENABLED] ?: false
+        BlockerStateStore.syncBlockerConfig(context, enabled, packages)
+    }
+
+    suspend fun syncBlockerPreferencesToStore() {
+        val current = userPreferencesFlow.first()
+        BlockerStateStore.syncBlockerConfig(context, current.appBlockerEnabled, current.blockedPackages)
+    }
+
+    suspend fun incrementFocusBreakCycles(): Int {
+        var newVal = 0
+        context.dataStore.edit { prefs ->
+            newVal = (prefs[Keys.COMPLETED_FOCUS_BREAK_CYCLES] ?: 0) + 1
+            prefs[Keys.COMPLETED_FOCUS_BREAK_CYCLES] = newVal
+        }
+        return newVal
+    }
+
+    suspend fun incrementFlashcardsReviewed(): Int {
+        var newVal = 0
+        context.dataStore.edit { prefs ->
+            newVal = (prefs[Keys.FLASHCARDS_REVIEWED_COUNT] ?: 0) + 1
+            prefs[Keys.FLASHCARDS_REVIEWED_COUNT] = newVal
+        }
+        return newVal
     }
 
     suspend fun setSectionWallpaper(sectionKey: String, uriString: String?) {

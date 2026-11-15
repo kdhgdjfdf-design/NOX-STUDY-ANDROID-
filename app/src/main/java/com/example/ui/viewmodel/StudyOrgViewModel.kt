@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.NoxStudyApp
+import com.example.data.badges.BadgeEvaluator
 import com.example.data.model.ExamEntity
 import com.example.data.model.LessonEntity
 import com.example.data.model.SubjectEntity
@@ -124,6 +125,9 @@ class StudyOrgViewModel(application: Application) : AndroidViewModel(application
             } else {
                 NotificationHelper.cancelAlarm(context, (10000 + lesson.id).toInt())
             }
+            if (lesson.status == "reviewed") {
+                BadgeEvaluator.evaluateAll(context)
+            }
         }
     }
 
@@ -175,6 +179,7 @@ class StudyOrgViewModel(application: Application) : AndroidViewModel(application
             taskDao.updateTask(task)
             if (task.status == "COMPLETED") {
                 NotificationHelper.cancelAlarm(context, (20000 + task.id).toInt())
+                BadgeEvaluator.evaluateAll(context)
             }
         }
     }

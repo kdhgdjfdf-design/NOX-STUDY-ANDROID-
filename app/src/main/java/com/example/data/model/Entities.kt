@@ -135,3 +135,12 @@ data class ChallengeEntity(
     val rewardBadge: String = "🌟",
     val completedAt: Long? = null
 )
+
+@Entity(tableName = "badges")
+data class BadgeEntity(
+    @PrimaryKey val id: String,
+    val isUnlocked: Boolean = false,
+    val unlockedAt: Long? = null,
+    val hasCelebrated: Boolean = false
+)
+

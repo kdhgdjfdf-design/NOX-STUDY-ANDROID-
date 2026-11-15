@@ -69,6 +69,7 @@ import androidx.compose.ui.unit.sp
 import com.example.NoxStudyApp
 import com.example.data.backup.BackupRepository
 import com.example.ui.profile.ProfileDialog
+import com.example.ui.viewmodel.BadgesViewModel
 import com.example.ui.viewmodel.MainViewModel
 import com.example.ui.viewmodel.Screen
 import kotlinx.coroutines.launch
@@ -77,6 +78,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun SettingsScreen(
     mainViewModel: MainViewModel,
+    badgesViewModel: BadgesViewModel,
     onBack: () -> Unit
 ) {
     BackHandler { onBack() }
@@ -84,6 +86,7 @@ fun SettingsScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val prefs by mainViewModel.preferences.collectAsState()
+    val badges by badgesViewModel.badges.collectAsState()
 
     val backupRepo = remember {
         BackupRepository(
@@ -569,6 +572,11 @@ fun SettingsScreen(
     if (showProfileDialog) {
         ProfileDialog(
             mainViewModel = mainViewModel,
+            badges = badges,
+            onOpenBadges = {
+                showProfileDialog = false
+                mainViewModel.navigateTo(Screen.Badges)
+            },
             onDismiss = { showProfileDialog = false }
         )
     }

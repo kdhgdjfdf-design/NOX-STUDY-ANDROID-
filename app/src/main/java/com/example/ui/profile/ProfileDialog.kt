@@ -49,17 +49,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
+import androidx.compose.material3.TextButton
+import androidx.compose.ui.text.style.TextAlign
 import com.example.R
+import com.example.data.badges.BadgeUiModel
+import com.example.ui.screens.badges.BadgeEmblemArtwork
 import com.example.ui.viewmodel.MainViewModel
 
 @Composable
 fun ProfileDialog(
     mainViewModel: MainViewModel,
+    badges: List<BadgeUiModel>,
+    onOpenBadges: () -> Unit,
     onDismiss: () -> Unit
 ) {
     val prefs = mainViewModel.preferences.value
     var name by remember { mutableStateOf(prefs.userName) }
     var avatarUri by remember { mutableStateOf(prefs.avatarUri) }
+    val unlockedBadges = badges.filter { it.isUnlocked }
 
     val photoPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -160,37 +167,72 @@ fun ProfileDialog(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // Achievements Summary Card
+                // Achievements Summary Card (Real Unlocked Badges)
                 Surface(
                     color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(modifier = Modifier.padding(14.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = Icons.Default.EmojiEvents,
-                                contentDescription = null,
-                                tint = Color(0xFFD99B26),
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = "ملخص الإنجازات والوسام",
-                                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceAround
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            AchievementBadge("🌟", "بداية الرحلة")
-                            AchievementBadge("⏳", "التركيز الهادئ")
-                            AchievementBadge("📚", "منظم الدروس")
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Default.EmojiEvents,
+                                    contentDescription = null,
+                                    tint = Color(0xFFD99B26),
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "الأوسمة المكتسبة (${unlockedBadges.size}/${badges.size})",
+                                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+
+                            TextButton(onClick = onOpenBadges) {
+                                Text("عرض الكل", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold))
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(6.dp))
+
+                        if (unlockedBadges.isEmpty()) {
+                            Text(
+                                text = "أكمل أول جلسة تركيز أو مهامك الدراسية لفتح أوسمتك الحقيقية هنا.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        } else {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceEvenly
+                            ) {
+                                unlockedBadges.take(3).forEach { badge ->
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        BadgeEmblemArtwork(
+                                            shape = badge.definition.shape,
+                                            accentColor = Color(badge.definition.accentHex),
+                                            secondaryColor = Color(badge.definition.secondaryHex),
+                                            isUnlocked = true,
+                                            size = 44.dp
+                                        )
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = badge.definition.titleAr,
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            maxLines = 1
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
                 }

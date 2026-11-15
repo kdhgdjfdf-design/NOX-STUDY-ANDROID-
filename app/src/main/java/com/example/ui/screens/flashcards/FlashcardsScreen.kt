@@ -69,9 +69,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import androidx.compose.material.icons.outlined.DeleteOutline
+import androidx.compose.material3.ButtonDefaults
 import com.example.R
 import com.example.data.model.FlashcardEntity
 import com.example.data.model.SubjectEntity
+import com.example.ui.theme.RedExit
 import com.example.ui.viewmodel.FlashcardsViewModel
 import com.example.ui.viewmodel.StudyOrgViewModel
 
@@ -100,6 +103,7 @@ fun FlashcardsScreen(
     val currentCard = filteredCards.getOrNull(safeIndex)
 
     var showAddCardDialog by remember { mutableStateOf(false) }
+    var cardPendingDelete by remember { mutableStateOf<FlashcardEntity?>(null) }
 
     Scaffold(
         topBar = {
@@ -226,12 +230,24 @@ fun FlashcardsScreen(
                     }
                 }
             } else if (currentCard != null) {
-                // Card Counter
-                Text(
-                    text = "بطاقة ${safeIndex + 1} من ${filteredCards.size}",
-                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                // Card Counter & Live Review Stats
+                val reviewedInFilter = filteredCards.count { it.lastReviewedAt > 0 }
+                Row(
+                    modifier = Modifier.fillMaxWidth(0.92f),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "بطاقة ${safeIndex + 1} من ${filteredCards.size}",
+                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = "تمت مراجعة $reviewedInFilter / ${filteredCards.size}",
+                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Medium),
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(10.dp))
 
@@ -246,6 +262,7 @@ fun FlashcardsScreen(
                         card = currentCard,
                         isFlipped = isFlipped,
                         onFlip = { flashcardsViewModel.flipCard() },
+                        onRequestDelete = { cardPendingDelete = currentCard },
                         onMemoryLevelSelect = { level ->
                             flashcardsViewModel.updateMemoryLevel(currentCard, level)
                         },
@@ -314,6 +331,46 @@ fun FlashcardsScreen(
             }
         )
     }
+
+    cardPendingDelete?.let { cardToDelete ->
+        AlertDialog(
+            onDismissRequest = { cardPendingDelete = null },
+            title = {
+                Text(
+                    text = "هل تريد حذف بطاقة المراجعة هذه؟",
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Text(
+                    text = "سيتم حذف هذه البطاقة فقط من القائمة دون حذف مجلد المادة أو أي بطاقات أخرى أو ملفات من الهاتف.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        flashcardsViewModel.deleteFlashcard(cardToDelete, filteredCards.size)
+                        cardPendingDelete = null
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = RedExit),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.testTag("confirm_delete_flashcard_button")
+                ) {
+                    Text("حذف", fontWeight = FontWeight.Bold, color = Color.White)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { cardPendingDelete = null },
+                    modifier = Modifier.testTag("cancel_delete_flashcard_button")
+                ) {
+                    Text("إلغاء")
+                }
+            }
+        )
+    }
 }
 
 @Composable
@@ -321,6 +378,7 @@ fun Interactive3DFlipCard(
     card: FlashcardEntity,
     isFlipped: Boolean,
     onFlip: () -> Unit,
+    onRequestDelete: () -> Unit,
     onMemoryLevelSelect: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -360,41 +418,60 @@ fun Interactive3DFlipCard(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
-                // Top Tag with optional recall status indicator
+                // Top Tag with optional recall status indicator & neat trash icon
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Surface(
-                        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f),
-                        shape = RoundedCornerShape(8.dp)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text(
-                            text = "السؤال",
-                            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
-                        )
-                    }
-
-                    if (card.lastReviewedAt > 0) {
-                        val (lvlText, lvlColor) = when (card.memoryLevel) {
-                            "EASY" -> "سهل" to Color(0xFF427A4E)
-                            "HARD" -> "صعب" to Color(0xFFC04B37)
-                            else -> "متوسط" to Color(0xFFD99B26)
-                        }
                         Surface(
-                            color = lvlColor.copy(alpha = 0.15f),
+                            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f),
                             shape = RoundedCornerShape(8.dp)
                         ) {
                             Text(
-                                text = "التذكّر: $lvlText",
-                                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Medium),
-                                color = lvlColor,
+                                text = "السؤال",
+                                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                                color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
                             )
                         }
+
+                        if (card.lastReviewedAt > 0) {
+                            val (lvlText, lvlColor) = when (card.memoryLevel) {
+                                "EASY" -> "سهل" to Color(0xFF427A4E)
+                                "HARD" -> "صعب" to Color(0xFFC04B37)
+                                else -> "متوسط" to Color(0xFFD99B26)
+                            }
+                            Surface(
+                                color = lvlColor.copy(alpha = 0.15f),
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Text(
+                                    text = "التذكّر: $lvlText",
+                                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Medium),
+                                    color = lvlColor,
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                                )
+                            }
+                        }
+                    }
+
+                    IconButton(
+                        onClick = onRequestDelete,
+                        modifier = Modifier
+                            .size(48.dp)
+                            .testTag("delete_flashcard_button")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.DeleteOutline,
+                            contentDescription = "حذف البطاقة",
+                            tint = MaterialTheme.colorScheme.error.copy(alpha = 0.8f),
+                            modifier = Modifier.size(20.dp)
+                        )
                     }
                 }
 

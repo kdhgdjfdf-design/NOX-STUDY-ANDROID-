@@ -28,7 +28,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.core.content.ContextCompat
+import android.content.Intent
 import com.example.data.model.SubjectEntity
+import com.example.service.NotificationHelper
+import com.example.ui.screens.badges.BadgeUnlockCelebrationDialog
+import com.example.ui.screens.badges.BadgesScreen
 import com.example.ui.screens.challenges.ChallengesScreen
 import com.example.ui.screens.flashcards.FlashcardsScreen
 import com.example.ui.screens.focus.AppBlockerScreen
@@ -39,6 +43,7 @@ import com.example.ui.screens.stats.StatsScreen
 import com.example.ui.screens.study.StudyOrgScreen
 import com.example.ui.screens.study.SubjectDetailScreen
 import com.example.ui.theme.NoxStudyTheme
+import com.example.ui.viewmodel.BadgesViewModel
 import com.example.ui.viewmodel.ChallengesViewModel
 import com.example.ui.viewmodel.FlashcardsViewModel
 import com.example.ui.viewmodel.FocusViewModel
@@ -55,14 +60,30 @@ class MainActivity : ComponentActivity() {
     private val flashcardsViewModel: FlashcardsViewModel by viewModels()
     private val challengesViewModel: ChallengesViewModel by viewModels()
     private val statsViewModel: StatsViewModel by viewModels()
+    private val badgesViewModel: BadgesViewModel by viewModels()
+
+    private fun handleNavigationIntent(intent: Intent?) {
+        if (intent?.getBooleanExtra(NotificationHelper.EXTRA_NAVIGATE_TO_FOCUS, false) == true) {
+            mainViewModel.navigateToFocusFromExternalIntent()
+            intent.removeExtra(NotificationHelper.EXTRA_NAVIGATE_TO_FOCUS)
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleNavigationIntent(intent)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        handleNavigationIntent(intent)
 
         setContent {
             val prefs by mainViewModel.preferences.collectAsState()
             val currentScreen by mainViewModel.currentScreen.collectAsState()
+            val newlyUnlockedQueue by badgesViewModel.newlyUnlockedQueue.collectAsState()
 
             // System dark vs user explicit selection
             val isDark = when (prefs.themeMode) {
@@ -105,8 +126,16 @@ class MainActivity : ComponentActivity() {
                             focusViewModel = focusViewModel,
                             flashcardsViewModel = flashcardsViewModel,
                             challengesViewModel = challengesViewModel,
-                            statsViewModel = statsViewModel
+                            statsViewModel = statsViewModel,
+                            badgesViewModel = badgesViewModel
                         )
+
+                        newlyUnlockedQueue.firstOrNull()?.let { newlyUnlocked ->
+                            BadgeUnlockCelebrationDialog(
+                                badge = newlyUnlocked,
+                                onDismiss = { badgesViewModel.markCelebrated(newlyUnlocked.id) }
+                            )
+                        }
                     }
                 }
             }
@@ -122,14 +151,16 @@ fun AppNavigation(
     focusViewModel: FocusViewModel,
     flashcardsViewModel: FlashcardsViewModel,
     challengesViewModel: ChallengesViewModel,
-    statsViewModel: StatsViewModel
+    statsViewModel: StatsViewModel,
+    badgesViewModel: BadgesViewModel
 ) {
     var activeSubjectForDetail by remember { mutableStateOf<SubjectEntity?>(null) }
 
     when (currentScreen) {
         Screen.Home -> {
             HomeScreen(
-                mainViewModel = mainViewModel
+                mainViewModel = mainViewModel,
+                badgesViewModel = badgesViewModel
             )
         }
         Screen.StudyOrg -> {
@@ -152,7 +183,10 @@ fun AppNavigation(
                     onBack = { mainViewModel.navigateBack() }
                 )
             } else {
-                HomeScreen(mainViewModel = mainViewModel)
+                HomeScreen(
+                    mainViewModel = mainViewModel,
+                    badgesViewModel = badgesViewModel
+                )
             }
         }
         Screen.Focus -> {
@@ -181,6 +215,12 @@ fun AppNavigation(
                 onBack = { mainViewModel.navigateBack() }
             )
         }
+        Screen.Badges -> {
+            BadgesScreen(
+                badgesViewModel = badgesViewModel,
+                onBack = { mainViewModel.navigateBack() }
+            )
+        }
         Screen.Stats -> {
             StatsScreen(
                 statsViewModel = statsViewModel,
@@ -190,6 +230,7 @@ fun AppNavigation(
         Screen.Settings -> {
             SettingsScreen(
                 mainViewModel = mainViewModel,
+                badgesViewModel = badgesViewModel,
                 onBack = { mainViewModel.navigateBack() }
             )
         }

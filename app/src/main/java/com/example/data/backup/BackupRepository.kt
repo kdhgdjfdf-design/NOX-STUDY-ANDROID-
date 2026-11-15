@@ -3,6 +3,7 @@ package com.example.data.backup
 import android.content.Context
 import android.net.Uri
 import com.example.data.AppDatabase
+import com.example.data.model.BadgeEntity
 import com.example.data.model.ChallengeEntity
 import com.example.data.model.ExamEntity
 import com.example.data.model.FlashcardEntity
@@ -28,7 +29,7 @@ class BackupRepository(
         try {
             val root = JSONObject()
             root.put("app", "NOX STUDY")
-            root.put("version", 1)
+            root.put("version", 2)
             root.put("timestamp", System.currentTimeMillis())
 
             // Subjects
@@ -148,6 +149,19 @@ class BackupRepository(
             }
             root.put("challenges", challengesArray)
 
+            // Badges
+            val badges = database.badgeDao().getAllBadgesList()
+            val badgesArray = JSONArray()
+            badges.forEach { b ->
+                val obj = JSONObject()
+                obj.put("id", b.id)
+                obj.put("isUnlocked", b.isUnlocked)
+                obj.put("unlockedAt", b.unlockedAt ?: -1L)
+                obj.put("hasCelebrated", b.hasCelebrated)
+                badgesArray.put(obj)
+            }
+            root.put("badges", badgesArray)
+
             context.contentResolver.openOutputStream(uri)?.use { os ->
                 OutputStreamWriter(os).use { writer ->
                     writer.write(root.toString(2))
@@ -255,6 +269,20 @@ class BackupRepository(
                     lastReviewedAt = obj.optLong("lastReviewedAt", 0L)
                 )
                 database.flashcardDao().insertFlashcard(card)
+            }
+
+            // Restore badges if present
+            val badgesArray = root.optJSONArray("badges") ?: JSONArray()
+            for (i in 0 until badgesArray.length()) {
+                val obj = badgesArray.getJSONObject(i)
+                val unlockedAtVal = obj.optLong("unlockedAt", -1L)
+                val badge = BadgeEntity(
+                    id = obj.getString("id"),
+                    isUnlocked = obj.optBoolean("isUnlocked", false),
+                    unlockedAt = if (unlockedAtVal > 0L) unlockedAtVal else null,
+                    hasCelebrated = obj.optBoolean("hasCelebrated", false)
+                )
+                database.badgeDao().upsertBadge(badge)
             }
 
             Result.success(Unit)

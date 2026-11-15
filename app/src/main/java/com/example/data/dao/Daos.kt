@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.example.data.model.BadgeEntity
 import com.example.data.model.ChallengeEntity
 import com.example.data.model.ExamEntity
 import com.example.data.model.FlashcardEntity
@@ -50,6 +51,9 @@ interface LessonDao {
     @Query("SELECT COUNT(*) FROM lessons WHERE subjectId = :subjectId AND status = 'needs_revision'")
     fun getRevisionsDueCountBySubject(subjectId: Long): Flow<Int>
 
+    @Query("SELECT COUNT(*) FROM lessons WHERE status = 'reviewed'")
+    suspend fun getReviewedLessonsCountSync(): Int
+
     @Query("SELECT * FROM lessons WHERE id = :id LIMIT 1")
     suspend fun getLessonById(id: Long): LessonEntity?
 
@@ -70,6 +74,9 @@ interface TaskDao {
 
     @Query("SELECT * FROM tasks WHERE subjectId = :subjectId ORDER BY dueDate ASC")
     fun getTasksBySubject(subjectId: Long): Flow<List<TaskEntity>>
+
+    @Query("SELECT COUNT(*) FROM tasks WHERE status = 'COMPLETED'")
+    suspend fun getCompletedTasksCountSync(): Int
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTask(task: TaskEntity): Long
@@ -110,6 +117,9 @@ interface FlashcardDao {
     @Query("SELECT * FROM flashcards WHERE lessonId = :lessonId ORDER BY id DESC")
     fun getFlashcardsByLesson(lessonId: Long): Flow<List<FlashcardEntity>>
 
+    @Query("SELECT COUNT(*) FROM flashcards WHERE lastReviewedAt > 0")
+    suspend fun getReviewedFlashcardsCountSync(): Int
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFlashcard(flashcard: FlashcardEntity): Long
 
@@ -133,6 +143,12 @@ interface FocusDao {
 
     @Query("SELECT SUM(actualDurationSeconds) FROM focus_sessions WHERE dateTimestamp >= :sinceTimestamp")
     suspend fun getTotalFocusSecondsSince(sinceTimestamp: Long): Long?
+
+    @Query("SELECT * FROM focus_sessions WHERE completed = 1 ORDER BY dateTimestamp ASC")
+    suspend fun getCompletedSessionsSync(): List<FocusSessionEntity>
+
+    @Query("SELECT COUNT(*) FROM focus_sessions WHERE completed = 1")
+    suspend fun getCompletedSessionsCountSync(): Int
 }
 
 @Dao
@@ -151,4 +167,25 @@ interface ChallengeDao {
 
     @Delete
     suspend fun deleteChallenge(challenge: ChallengeEntity)
+}
+
+@Dao
+interface BadgeDao {
+    @Query("SELECT * FROM badges")
+    fun getAllBadges(): Flow<List<BadgeEntity>>
+
+    @Query("SELECT * FROM badges")
+    suspend fun getAllBadgesList(): List<BadgeEntity>
+
+    @Query("SELECT * FROM badges WHERE id = :id LIMIT 1")
+    suspend fun getBadgeById(id: String): BadgeEntity?
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertBadge(badge: BadgeEntity): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertBadge(badge: BadgeEntity)
+
+    @Update
+    suspend fun updateBadge(badge: BadgeEntity)
 }

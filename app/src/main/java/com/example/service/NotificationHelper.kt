@@ -16,6 +16,8 @@ object NotificationHelper {
     const val CHANNEL_REMINDERS = "nox_study_reminders"
     const val CHANNEL_AUDIO = "nox_study_audio"
     const val CHANNEL_FOCUS = "nox_study_focus"
+    const val CHANNEL_FOCUS_ONGOING = "nox_study_focus_ongoing"
+    const val EXTRA_NAVIGATE_TO_FOCUS = "extra_navigate_to_focus"
 
     fun createNotificationChannels(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -47,9 +49,19 @@ object NotificationHelper {
                 enableVibration(true)
             }
 
+            val focusOngoingChannel = NotificationChannel(
+                CHANNEL_FOCUS_ONGOING,
+                "مؤقت التركيز الجاري",
+                NotificationManager.IMPORTANCE_LOW
+            ).apply {
+                description = "يعرض حالة مؤقت التركيز وحجب التطبيقات أثناء الجلسة"
+                setShowBadge(false)
+            }
+
             notificationManager.createNotificationChannel(remindersChannel)
             notificationManager.createNotificationChannel(audioChannel)
             notificationManager.createNotificationChannel(focusChannel)
+            notificationManager.createNotificationChannel(focusOngoingChannel)
         }
     }
 
@@ -61,7 +73,10 @@ object NotificationHelper {
         channelId: String = CHANNEL_REMINDERS
     ) {
         val tapIntent = Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            if (channelId == CHANNEL_FOCUS) {
+                putExtra(EXTRA_NAVIGATE_TO_FOCUS, true)
+            }
         }
         val pendingIntent = PendingIntent.getActivity(
             context,

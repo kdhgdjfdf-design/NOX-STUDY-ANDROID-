@@ -65,7 +65,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.content.Intent
+import android.provider.Settings
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.R
+import com.example.service.AppBlockerAccessibilityService
 import com.example.ui.components.SquareFlipClock
 import com.example.ui.theme.RedExit
 import com.example.ui.viewmodel.FocusMode
@@ -96,6 +105,28 @@ fun FocusScreen(
     val isIdle = focusState == FocusState.IDLE
     val isBreak = focusState == FocusState.BREAK_RUNNING || focusState == FocusState.BREAK_PAUSED
 
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val serviceConnected by AppBlockerAccessibilityService.isServiceConnected.collectAsState()
+    var isAccessibilityEnabled by remember {
+        mutableStateOf(AppBlockerAccessibilityService.isPermissionEffectivelyGranted(context))
+    }
+
+    DisposableEffect(lifecycleOwner, serviceConnected) {
+        isAccessibilityEnabled = AppBlockerAccessibilityService.isPermissionEffectivelyGranted(context)
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                isAccessibilityEnabled = AppBlockerAccessibilityService.isPermissionEffectivelyGranted(context)
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+
+    val isBlockerPermissionMissing = prefs.appBlockerEnabled &&
+        prefs.blockedPackages.isNotEmpty() &&
+        !isAccessibilityEnabled
+
     Scaffold(
         topBar = {
             Row(
@@ -119,13 +150,31 @@ fun FocusScreen(
                 }
 
                 // App blocker status chip
+                val chipBg = when {
+                    isBlockerPermissionMissing -> Color(0xFFFFF3E0)
+                    prefs.appBlockerEnabled -> Color(0xFFE8F5E9)
+                    else -> MaterialTheme.colorScheme.surfaceVariant
+                }
+                val chipBorder = when {
+                    isBlockerPermissionMissing -> Color(0xFFFFB74D)
+                    prefs.appBlockerEnabled -> Color(0xFF81C784)
+                    else -> MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                }
+                val chipTint = when {
+                    isBlockerPermissionMissing -> Color(0xFFE65100)
+                    prefs.appBlockerEnabled -> Color(0xFF2E7D32)
+                    else -> MaterialTheme.colorScheme.onSurfaceVariant
+                }
+                val chipLabel = when {
+                    isBlockerPermissionMissing -> "صلاحية الحجب مطلوبة"
+                    prefs.appBlockerEnabled -> "الحجب نشط"
+                    else -> "إدارة الحجب"
+                }
+
                 Surface(
-                    color = if (prefs.appBlockerEnabled) Color(0xFFE8F5E9) else MaterialTheme.colorScheme.surfaceVariant,
+                    color = chipBg,
                     shape = RoundedCornerShape(20.dp),
-                    border = androidx.compose.foundation.BorderStroke(
-                        1.dp,
-                        if (prefs.appBlockerEnabled) Color(0xFF81C784) else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-                    ),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, chipBorder),
                     modifier = Modifier
                         .clickable { mainViewModel.navigateTo(Screen.AppBlockerSetup) }
                         .testTag("focus_app_blocker_chip")
@@ -135,16 +184,16 @@ fun FocusScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Security,
+                            imageVector = if (isBlockerPermissionMissing) Icons.Default.Warning else Icons.Default.Security,
                             contentDescription = null,
-                            tint = if (prefs.appBlockerEnabled) Color(0xFF2E7D32) else MaterialTheme.colorScheme.onSurfaceVariant,
+                            tint = chipTint,
                             modifier = Modifier.size(16.dp)
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = if (prefs.appBlockerEnabled) "الحجب نشط" else "إدارة الحجب",
+                            text = chipLabel,
                             style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-                            color = if (prefs.appBlockerEnabled) Color(0xFF1B5E20) else MaterialTheme.colorScheme.onSurfaceVariant
+                            color = chipTint
                         )
                     }
                 }
@@ -166,6 +215,52 @@ fun FocusScreen(
                     .padding(20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                if (isBlockerPermissionMissing) {
+                    Surface(
+                        shape = RoundedCornerShape(16.dp),
+                        color = Color(0xFFFFF3E0),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFFFB74D)),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 14.dp)
+                            .testTag("blocker_permission_warning_banner")
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 14.dp, vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Warning,
+                                    contentDescription = null,
+                                    tint = Color(0xFFE65100),
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "تم إيقاف إذن إمكانية الوصول؛ لن يتم حجب التطبيقات حتى تعيد تفعيله.",
+                                    style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Medium),
+                                    color = Color(0xFF5D4037)
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            TextButton(
+                                onClick = {
+                                    context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+                                }
+                            ) {
+                                Text("تفعيل", fontWeight = FontWeight.Bold, color = Color(0xFFE65100))
+                            }
+                        }
+                    }
+                }
+
                 // Mode Selector (Enabled only when IDLE)
                 if (isIdle) {
                     Surface(

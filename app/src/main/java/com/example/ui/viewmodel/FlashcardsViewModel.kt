@@ -4,7 +4,9 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.NoxStudyApp
+import com.example.data.badges.BadgeEvaluator
 import com.example.data.model.FlashcardEntity
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +16,10 @@ import kotlinx.coroutines.launch
 
 class FlashcardsViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val db = (application as NoxStudyApp).database
+    private val appContext = application.applicationContext
+    private val app = application as NoxStudyApp
+    private val db = app.database
+    private val prefsRepo = app.preferencesRepository
     private val flashcardDao = db.flashcardDao()
 
     val allFlashcards: StateFlow<List<FlashcardEntity>> = flashcardDao.getAllFlashcards().stateIn(
@@ -57,12 +62,14 @@ class FlashcardsViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun updateMemoryLevel(card: FlashcardEntity, level: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val updated = card.copy(
                 memoryLevel = level,
                 lastReviewedAt = System.currentTimeMillis()
             )
             flashcardDao.updateFlashcard(updated)
+            prefsRepo.incrementFlashcardsReviewed()
+            BadgeEvaluator.evaluateAll(appContext)
         }
     }
 
@@ -73,7 +80,7 @@ class FlashcardsViewModel(application: Application) : AndroidViewModel(applicati
         answer: String,
         imageUri: String? = null
     ) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             flashcardDao.insertFlashcard(
                 FlashcardEntity(
                     subjectId = subjectId,
@@ -84,11 +91,24 @@ class FlashcardsViewModel(application: Application) : AndroidViewModel(applicati
                     memoryLevel = "MEDIUM"
                 )
             )
+            _currentCardIndex.value = 0
+            _isFlipped.value = false
         }
     }
 
-    fun deleteFlashcard(card: FlashcardEntity) {
-        viewModelScope.launch {
+    /**
+     * Deletes ONLY the specified flashcard from Room without affecting any sibling flashcards,
+     * the parent subject folder, or any original files on the device.
+     */
+    fun deleteFlashcard(card: FlashcardEntity, currentFilteredSize: Int = 1) {
+        _isFlipped.value = false
+        val remainingCount = (currentFilteredSize - 1).coerceAtLeast(0)
+        if (remainingCount == 0) {
+            _currentCardIndex.value = 0
+        } else if (_currentCardIndex.value >= remainingCount) {
+            _currentCardIndex.value = remainingCount - 1
+        }
+        viewModelScope.launch(Dispatchers.IO) {
             flashcardDao.deleteFlashcard(card)
         }
     }

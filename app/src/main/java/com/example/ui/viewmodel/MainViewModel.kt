@@ -22,6 +22,7 @@ sealed class Screen(val route: String) {
     object AppBlockerSetup : Screen("app_blocker_setup")
     object Flashcards : Screen("flashcards")
     object Challenges : Screen("challenges")
+    object Badges : Screen("badges")
     object Stats : Screen("stats")
     object Settings : Screen("settings")
 }
@@ -87,6 +88,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             _screenStack.add(screen)
             _currentScreen.value = screen
         }
+    }
+
+    fun navigateToFocusFromExternalIntent() {
+        if (_currentScreen.value == Screen.Focus) return
+        _screenStack.removeAll { it == Screen.Focus }
+        _screenStack.add(Screen.Focus)
+        _currentScreen.value = Screen.Focus
     }
 
     fun navigateBack(): Boolean {

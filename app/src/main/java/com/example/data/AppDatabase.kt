@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.example.data.dao.BadgeDao
 import com.example.data.dao.ChallengeDao
 import com.example.data.dao.ExamDao
 import com.example.data.dao.FlashcardDao
@@ -12,6 +14,7 @@ import com.example.data.dao.FocusDao
 import com.example.data.dao.LessonDao
 import com.example.data.dao.SubjectDao
 import com.example.data.dao.TaskDao
+import com.example.data.model.BadgeEntity
 import com.example.data.model.ChallengeEntity
 import com.example.data.model.ExamEntity
 import com.example.data.model.FlashcardEntity
@@ -31,9 +34,10 @@ import kotlinx.coroutines.launch
         ExamEntity::class,
         FlashcardEntity::class,
         FocusSessionEntity::class,
-        ChallengeEntity::class
+        ChallengeEntity::class,
+        BadgeEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -45,10 +49,26 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun flashcardDao(): FlashcardDao
     abstract fun focusDao(): FocusDao
     abstract fun challengeDao(): ChallengeDao
+    abstract fun badgeDao(): BadgeDao
 
     companion object {
         @Volatile
         private var INSTANCE: AppDatabase? = null
+
+        val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS `badges` (
+                        `id` TEXT NOT NULL PRIMARY KEY,
+                        `isUnlocked` INTEGER NOT NULL,
+                        `unlockedAt` INTEGER,
+                        `hasCelebrated` INTEGER NOT NULL
+                    )
+                    """.trimIndent()
+                )
+            }
+        }
 
         fun getDatabase(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
@@ -57,8 +77,8 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "nox_study_database"
                 )
+                    .addMigrations(MIGRATION_1_2)
                     .addCallback(DatabaseCallback())
-                    .fallbackToDestructiveMigration()
                     .build()
                 INSTANCE = instance
                 instance
